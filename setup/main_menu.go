@@ -6,46 +6,54 @@ import (
 	"strings"
 )
 
+var defaultOption int
+
 func newScreen(prompt survey.Prompt, selection *string) {
 	util.ClearClient()
 	survey.AskOne(prompt, selection, nil)
 }
 
+func shortAnswer(s string) (r string) {
+	r = s
+	if len(r) >= 20 {
+		r = r[0:20] + " ..."
+	}
+	return
+}
+
+func shortAnswerSlice(s []string) (r string) {
+	if len(s) != 0 {
+		r = s[0]
+		if r != shortAnswer(r) {
+			r = shortAnswer(r)
+		}
+		if len(s) > 1 {
+			r += " ..."
+		}
+	}
+	return
+}
+
+func setDefaultOption(i int, o []string) {
+	i++
+	for len(o) <= i {
+		i--
+	}
+	defaultOption = i
+}
+
 func mainMenu() {
-	var (
-		defaultOption int
-		saved         bool
-	)
-
-	shortAnswer := func(s string) (r string) {
-		r = s
-		if len(r) >= 20 {
-			r = r[0:20] + " ..."
-		}
-		return
-	}
-	firstLine := func(s []string) (r string) {
-		if len(s) != 0 {
-			r = s[0]
-			if r != shortAnswer(r) {
-				r = shortAnswer(r)
-			}
-			if len(s) > 1 {
-				r += " ..."
-			}
-		}
-		return
-	}
-
-	for !saved {
+	submitted := false
+	for !submitted {
 		options := []string{
 			"Name           " + shortAnswer(answers.Name),
 			"Description    " + shortAnswer(answers.Description),
 			"Source         " + shortAnswer(answers.Source),
-			"Excludes       " + firstLine(answers.Excludes),
+			"Excludes       " + shortAnswerSlice(answers.Excludes),
 		}
-		if answers.savable() {
+		if answers.submittable() {
 			options = append(options, ">> SAVE <<")
+			setDefaultOption(len(options), options)
 		}
 		prompt := &survey.Select{
 			Message: "Choose:",
@@ -54,21 +62,22 @@ func mainMenu() {
 		}
 		selectedOption := ""
 		newScreen(prompt, &selectedOption)
-		switch selectedOption {
-		case options[0]:
-			defaultOption = 1
-			getName()
-		case options[1]:
-			defaultOption = 2
-			getDescription()
-		case options[2]:
-			defaultOption = 3
-			getSource()
-		case options[3]:
-			defaultOption = 4
-			getExcludes()
-		default:
-			saved = true
+		for i, o := range options {
+			if o == selectedOption {
+				switch i {
+				case 0:
+					getName()
+				case 1:
+					getDescription()
+				case 2:
+					getSource()
+				case 3:
+					getExcludes()
+				default:
+					submitted = true
+				}
+				setDefaultOption(i, options)
+			}
 		}
 	}
 }

@@ -8,7 +8,7 @@ type Setup struct {
 	//      Destination string
 }
 
-func (s Setup) savable() (r bool) {
+func (s Setup) submittable() bool {
 	return s.Name != "" && s.Source != ""
 }
 
