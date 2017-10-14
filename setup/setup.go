@@ -1,21 +1,10 @@
 package setup
 
-type Setup struct {
-	Name        string
-	Description string
-	Source      string
-	Excludes    []string
-	//      Destination string
-}
-
-func (s Setup) submittable() bool {
-	return s.Name != "" && s.Source != ""
-}
-
-var (
-	answers *Setup = &Setup{}
+import (
+	"github.com/orange-lightsaber/pretty-safe-backup/settings"
 )
 
 func Build() {
-	mainMenu()
+	answerSet := mainMenu(&settings.Setup{})
+	settings.NewConfig(answerSet)
 }
