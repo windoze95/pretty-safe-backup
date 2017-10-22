@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"log"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -25,6 +26,9 @@ wish to backup, you may define these excluded
 items in the following "Excludes" step.`,
 		Default: source.Result,
 	}
-	survey.AskOne(prompt, &source, nil)
+	err := survey.AskOne(prompt, &source, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	*answer = source.Result
 }

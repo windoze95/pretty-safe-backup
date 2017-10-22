@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"log"
+
 	"github.com/orange-lightsaber/pretty-safe-backup/settings"
 	"github.com/orange-lightsaber/pretty-safe-backup/util"
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -28,7 +30,6 @@ func shortAnswerSlice(s []string) (r string) {
 }
 
 func mainMenu(answers *settings.Setup) *settings.Setup {
-	submitted := false
 	defaultOption := 0
 	setDefaultOption := func(i int, o []string) {
 		i++
@@ -37,25 +38,30 @@ func mainMenu(answers *settings.Setup) *settings.Setup {
 		}
 		defaultOption = i
 	}
-	for !submitted {
+Menu:
+	for {
 		options := []string{
 			"Name           " + shortAnswer(answers.Name),
 			"Description    " + shortAnswer(answers.Description),
 			"Source         " + shortAnswer(answers.Source),
 			"Excludes       " + shortAnswerSlice(answers.Excludes),
+			"Destination    " + shortAnswerSlice(answers.Excludes),
 		}
 		if answers.Submittable() {
 			options = append(options, ">> Next <<")
 			setDefaultOption(len(options), options)
 		}
 		prompt := &survey.Select{
-			Message: "Choose:",
+			Message: "Complete the required fields to setup your back-up:",
 			Options: options,
 			Default: options[defaultOption],
 		}
 		selectedOption := ""
 		util.ClearClient()
-		survey.AskOne(prompt, &selectedOption, nil)
+		err := survey.AskOne(prompt, &selectedOption, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
 		for i, o := range options {
 			if o == selectedOption {
 				util.ClearClient()
@@ -68,8 +74,10 @@ func mainMenu(answers *settings.Setup) *settings.Setup {
 					setSource(&answers.Source)
 				case 3:
 					setExcludes(&answers.Excludes)
+				case 4:
+					answers.Destination = setDestination(answers.Destination) // because maps
 				default:
-					submitted = true
+					break Menu
 				}
 				setDefaultOption(i, options)
 			}

@@ -17,10 +17,20 @@ type Setup struct {
 	Description string
 	Source      string
 	Excludes    []string
+	Destination map[string]string
 }
 
 func (s Setup) Submittable() bool {
-	return s.Name != "" && s.Source != ""
+	strs := s.Name != "" &&
+		s.Source != ""
+	maps := func() bool {
+		dest := ((s.Destination["localHost"] != "" ||
+			s.Destination["remoteHost"] != "") &&
+			s.Destination["username"] != "") ||
+			s.Destination["mountPoint"] != ""
+		return dest
+	}
+	return strs && maps()
 }
 
 var (
@@ -51,6 +61,7 @@ func NewConfig(answerSet *Setup) {
 		"description": answerSet.Description,
 		"source":      answerSet.Source,
 		"excludes":    answerSet.Excludes,
+		"destination": answerSet.Destination,
 	}
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {

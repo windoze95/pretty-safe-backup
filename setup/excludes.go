@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"log"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -37,6 +38,9 @@ func setExcludes(answer *[]string) {
 		Message: "Excluded directories and files (optional)",
 		Default: excludes.generateDefault(),
 	}
-	survey.AskOne(prompt, &excludes, nil)
+	err := survey.AskOne(prompt, &excludes, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	*answer = excludes.Result
 }

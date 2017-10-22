@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"log"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -21,6 +22,9 @@ func setName(answer *string) {
 		Message: "Create a name for this operation",
 		Default: name.Result,
 	}
-	survey.AskOne(prompt, &name, nil)
+	err := survey.AskOne(prompt, &name, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	*answer = name.Result
 }

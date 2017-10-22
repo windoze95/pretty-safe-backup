@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"log"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -21,6 +22,9 @@ func setDescription(answer *string) {
 		Message: "Write a brief description (optional)",
 		Default: description.Result,
 	}
-	survey.AskOne(prompt, &description, nil)
+	err := survey.AskOne(prompt, &description, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	*answer = description.Result
 }
