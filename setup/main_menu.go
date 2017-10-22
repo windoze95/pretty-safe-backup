@@ -16,19 +16,6 @@ func shortAnswer(s string) (r string) {
 	return
 }
 
-func shortAnswerSlice(s []string) (r string) {
-	if len(s) != 0 {
-		r = s[0]
-		if r != shortAnswer(r) {
-			r = shortAnswer(r)
-		}
-		if len(s) > 1 {
-			r += " ..."
-		}
-	}
-	return
-}
-
 func mainMenu(answers *settings.Setup) *settings.Setup {
 	defaultOption := 0
 	setDefaultOption := func(i int, o []string) {
@@ -43,9 +30,9 @@ Menu:
 		options := []string{
 			"Name           " + shortAnswer(answers.Name),
 			"Description    " + shortAnswer(answers.Description),
-			"Source         " + shortAnswer(answers.Source),
-			"Excludes       " + shortAnswerSlice(answers.Excludes),
-			"Destination    " + shortAnswerSlice(answers.Excludes),
+			"Source",
+			"Excludes",
+			"Destination",
 		}
 		if answers.Submittable() {
 			options = append(options, ">> Next <<")

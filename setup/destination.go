@@ -69,14 +69,14 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 		{
 			Name: "port",
 			Prompt: &survey.Input{
-				Message: "SSH port, leave this blank to use the default port (22).\n",
+				Message: "SSH port, leave this blank to use the default.\n",
 				Default: setDefaultOption(dest, "port"),
 			},
 		},
 		{
 			Name: "privateKeyUrl",
 			Prompt: &survey.Input{
-				Message: "SSH port, leave this blank to use the default (" + os.Getenv("HOME") + "/.ssh/id_rsa).\n",
+				Message: "Location of SSH private key, leave this blank to use the default.\n",
 				Default: setDefaultOption(dest, "privateKeyUrl"),
 			},
 		},
@@ -151,6 +151,16 @@ func setDestination(answer map[string]string) map[string]string {
 func setDefaultOption(dest map[string]string, d string) (r string) {
 	if dest[d] != "" {
 		r = dest[d]
+	}
+	if d == "port" {
+		if dest[d] == "" {
+			r = "22"
+		}
+	}
+	if d == "privateKeyUrl" {
+		if dest[d] == "" {
+			r = os.Getenv("HOME") + "/.ssh/id_rsa"
+		}
 	}
 	return
 }

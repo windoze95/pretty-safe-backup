@@ -26,7 +26,9 @@ func (s Setup) Submittable() bool {
 	maps := func() bool {
 		dest := ((s.Destination["localHost"] != "" ||
 			s.Destination["remoteHost"] != "") &&
-			s.Destination["username"] != "") ||
+			s.Destination["username"] != "" &&
+			s.Destination["port"] != "" &&
+			s.Destination["privateKeyUrl"] != "") ||
 			s.Destination["mountPoint"] != ""
 		return dest
 	}
