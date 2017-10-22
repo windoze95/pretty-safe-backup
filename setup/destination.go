@@ -2,6 +2,7 @@ package setup
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/orange-lightsaber/pretty-safe-backup/util"
@@ -13,10 +14,11 @@ type Destination struct {
 }
 
 type SSHConfig struct {
-	LocalHost  string `survey:"localHost"`
-	RemoteHost string `survey:"remoteHost"`
-	Username   string `survey:"username"`
-	Port       string `survey:"port"`
+	LocalHost     string `survey:"localHost"`
+	RemoteHost    string `survey:"remoteHost"`
+	Username      string `survey:"username"`
+	Port          string `survey:"port"`
+	PrivateKeyUrl string `survey:"privateKeyUrl"`
 }
 
 func (sc *SSHConfig) WriteAnswer(destination string, value interface{}) error {
@@ -32,6 +34,9 @@ func (sc *SSHConfig) WriteAnswer(destination string, value interface{}) error {
 	}
 	if destination == "port" {
 		sc.Port = strings.Trim(value.(string), " ")
+	}
+	if destination == "privateKeyUrl" {
+		sc.PrivateKeyUrl = strings.Trim(value.(string), " ")
 	}
 	return nil
 }
@@ -68,16 +73,24 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 				Default: setDefaultOption(dest, "port"),
 			},
 		},
+		{
+			Name: "privateKeyUrl",
+			Prompt: &survey.Input{
+				Message: "SSH port, leave this blank to use the default (" + os.Getenv("HOME") + "/.ssh/id_rsa).\n",
+				Default: setDefaultOption(dest, "privateKeyUrl"),
+			},
+		},
 	}
 	err := survey.Ask(qs, &sshConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return map[string]string{
-		"localHost":  sshConfig.LocalHost,
-		"remoteHost": sshConfig.RemoteHost,
-		"username":   sshConfig.Username,
-		"port":       sshConfig.Port,
+		"localHost":     sshConfig.LocalHost,
+		"remoteHost":    sshConfig.RemoteHost,
+		"username":      sshConfig.Username,
+		"port":          sshConfig.Port,
+		"privateKeyUrl": sshConfig.PrivateKeyUrl,
 	}
 }
 
