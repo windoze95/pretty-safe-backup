@@ -16,6 +16,7 @@ type SSHConfig struct {
 	LocalHost  string `survey:"localHost"`
 	RemoteHost string `survey:"remoteHost"`
 	Username   string `survey:"username"`
+	Port       string `survey:"port"`
 }
 
 func (sc *SSHConfig) WriteAnswer(destination string, value interface{}) error {
@@ -28,6 +29,9 @@ func (sc *SSHConfig) WriteAnswer(destination string, value interface{}) error {
 	}
 	if destination == "username" {
 		sc.Username = strings.Trim(value.(string), " ")
+	}
+	if destination == "port" {
+		sc.Port = strings.Trim(value.(string), " ")
 	}
 	return nil
 }
@@ -57,6 +61,13 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 				Default: setDefaultOption(dest, "username"),
 			},
 		},
+		{
+			Name: "port",
+			Prompt: &survey.Input{
+				Message: "SSH port, leave this blank to use the default port (22).\n",
+				Default: setDefaultOption(dest, "port"),
+			},
+		},
 	}
 	err := survey.Ask(qs, &sshConfig)
 	if err != nil {
@@ -66,6 +77,7 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 		"localHost":  sshConfig.LocalHost,
 		"remoteHost": sshConfig.RemoteHost,
 		"username":   sshConfig.Username,
+		"port":       sshConfig.Port,
 	}
 }
 
