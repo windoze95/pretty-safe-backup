@@ -27,6 +27,7 @@ type Destination struct {
 	Username      string
 	Port          string
 	PrivateKeyUrl string
+	Type          string
 }
 
 func (s Setup) Submittable() bool {

@@ -30,8 +30,8 @@ func (dest *Destination) WriteAnswer(destination string, value interface{}) erro
 		dest.Port = trim
 	case "privateKeyUrl":
 		dest.PrivateKeyUrl = trim
-	default:
-		dest.Path = trim
+		// default:
+		// 	dest.Path = trim
 	}
 	return nil
 }
@@ -87,20 +87,31 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 	if err != nil {
 		log.Fatal(err)
 	}
+	dest.Type = "remote"
 	*answer = dest.Destination
 }
 
 func mountPoint(answer *settings.Destination) {
 	dest := Destination{*answer}
-	prompt := &survey.Input{
-		Message: "Absolute path to mount point.\n",
-		Default: dest.Path,
+	qs := []*survey.Question{
+		{
+			Name: "path",
+			Prompt: &survey.Input{
+				Message: "Absolute path to mount point.\n",
+				Default: dest.Path,
+			},
+		},
 	}
-	util.ClearClient()
-	err := survey.AskOne(prompt, &dest, nil)
+	err := survey.Ask(qs, &dest)
 	if err != nil {
 		log.Fatal(err)
 	}
+	dest.Type = "mount"
+	dest.LocalHost = ""
+	dest.RemoteHost = ""
+	dest.Username = ""
+	dest.Port = ""
+	dest.PrivateKeyUrl = ""
 	*answer = dest.Destination
 }
 
