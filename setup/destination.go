@@ -30,8 +30,6 @@ func (dest *Destination) WriteAnswer(destination string, value interface{}) erro
 		dest.Port = trim
 	case "privateKeyUrl":
 		dest.PrivateKeyUrl = trim
-		// default:
-		// 	dest.Path = trim
 	}
 	return nil
 }
