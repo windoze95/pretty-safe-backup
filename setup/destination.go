@@ -5,65 +5,67 @@ import (
 	"os"
 	"strings"
 
+	"github.com/orange-lightsaber/pretty-safe-backup/settings"
 	"github.com/orange-lightsaber/pretty-safe-backup/util"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
 type Destination struct {
-	Result map[string]string
+	settings.Destination
 }
 
-type SSHConfig struct {
-	LocalHost     string `survey:"localHost"`
-	RemoteHost    string `survey:"remoteHost"`
-	Username      string `survey:"username"`
-	Port          string `survey:"port"`
-	PrivateKeyUrl string `survey:"privateKeyUrl"`
-}
-
-func (sc *SSHConfig) WriteAnswer(destination string, value interface{}) error {
+func (dest *Destination) WriteAnswer(destination string, value interface{}) error {
 	util.ClearClient()
-	if destination == "localHost" {
-		sc.LocalHost = strings.Trim(value.(string), " ")
-	}
-	if destination == "remoteHost" {
-		sc.RemoteHost = strings.Trim(value.(string), " ")
-	}
-	if destination == "username" {
-		sc.Username = strings.Trim(value.(string), " ")
-	}
-	if destination == "port" {
-		sc.Port = strings.Trim(value.(string), " ")
-	}
-	if destination == "privateKeyUrl" {
-		sc.PrivateKeyUrl = strings.Trim(value.(string), " ")
+	trim := strings.Trim(value.(string), " ")
+	switch destination {
+	case "path":
+		dest.Path = trim
+	case "localHost":
+		dest.LocalHost = trim
+	case "remoteHost":
+		dest.RemoteHost = trim
+	case "username":
+		dest.Username = trim
+	case "port":
+		dest.Port = trim
+	case "privateKeyUrl":
+		dest.PrivateKeyUrl = trim
+	default:
+		dest.Path = trim
 	}
 	return nil
 }
 
-func remoteDirectory(dest map[string]string) map[string]string {
-	sshConfig := SSHConfig{}
+func remoteDirectory(answer *settings.Destination) {
+	dest := Destination{*answer}
 	qs := []*survey.Question{
+		{
+			Name: "path",
+			Prompt: &survey.Input{
+				Message: "Path to backup directory.\n",
+				Default: dest.Path,
+			},
+		},
 		{
 			Name: "localHost",
 			Prompt: &survey.Input{
 				Message: `If you have a hostname or IP on a local network to the back-up destination,
 this will be used first when available. Otherwise, leave this blank.` + "\n",
-				Default: setDefaultOption(dest, "localHost"),
+				Default: dest.RemoteHost,
 			},
 		},
 		{
 			Name: "remoteHost",
 			Prompt: &survey.Input{
 				Message: "Remote hostname or IP to the back-up destination.\n",
-				Default: setDefaultOption(dest, "remoteHost"),
+				Default: dest.RemoteHost,
 			},
 		},
 		{
 			Name: "username",
 			Prompt: &survey.Input{
 				Message: "Username on remote host.\n",
-				Default: setDefaultOption(dest, "username"),
+				Default: dest.Username,
 			},
 		},
 		{
@@ -81,49 +83,28 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 			},
 		},
 	}
-	err := survey.Ask(qs, &sshConfig)
+	err := survey.Ask(qs, &dest)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return map[string]string{
-		"localHost":     sshConfig.LocalHost,
-		"remoteHost":    sshConfig.RemoteHost,
-		"username":      sshConfig.Username,
-		"port":          sshConfig.Port,
-		"privateKeyUrl": sshConfig.PrivateKeyUrl,
-	}
+	*answer = dest.Destination
 }
 
-type MountConfig struct {
-	MountPoint string
-}
-
-func (mc *MountConfig) WriteAnswer(mountConfig string, value interface{}) error {
-	mc.MountPoint = strings.Trim(value.(string), " ")
-	return nil
-}
-
-func mountPoint(dest map[string]string) map[string]string {
-	mountConfig := MountConfig{}
+func mountPoint(answer *settings.Destination) {
+	dest := Destination{*answer}
 	prompt := &survey.Input{
 		Message: "Absolute path to mount point.\n",
-		Default: setDefaultOption(dest, "mountPoint"),
+		Default: dest.Path,
 	}
 	util.ClearClient()
-	err := survey.AskOne(prompt, &mountConfig, nil)
+	err := survey.AskOne(prompt, &dest, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return map[string]string{
-		"mountPoint": mountConfig.MountPoint,
-	}
+	*answer = dest.Destination
 }
 
-func setDestination(answer map[string]string) map[string]string {
-	if answer == nil {
-		answer = make(map[string]string)
-	}
-	destination := Destination{answer}
+func setDestination(answer *settings.Destination) {
 	options := []string{
 		"Remote directory",
 		"Mount point",
@@ -140,25 +121,22 @@ func setDestination(answer map[string]string) map[string]string {
 	util.ClearClient()
 	switch selectedOption {
 	case options[0]:
-		destination.Result = remoteDirectory(destination.Result)
+		remoteDirectory(answer)
 	case options[1]:
-		destination.Result = mountPoint(destination.Result)
+		mountPoint(answer)
 	}
-	destination.Result["destType"] = selectedOption
-	return destination.Result
 }
 
-func setDefaultOption(dest map[string]string, d string) (r string) {
-	if dest[d] != "" {
-		r = dest[d]
-	}
-	if d == "port" {
-		if dest[d] == "" {
+func setDefaultOption(dest Destination, d string) (r string) {
+	switch d {
+	case "port":
+		r = dest.Port
+		if dest.Port == "" {
 			r = "22"
 		}
-	}
-	if d == "privateKeyUrl" {
-		if dest[d] == "" {
+	case "privateKeyUrl":
+		r = dest.PrivateKeyUrl
+		if dest.PrivateKeyUrl == "" {
 			r = os.Getenv("HOME") + "/.ssh/id_rsa"
 		}
 	}

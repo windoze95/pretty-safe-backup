@@ -62,7 +62,7 @@ Menu:
 				case 3:
 					setExcludes(&answers.Excludes)
 				case 4:
-					answers.Destination = setDestination(answers.Destination) // because maps
+					setDestination(&answers.Destination) // because maps
 				default:
 					break Menu
 				}

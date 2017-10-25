@@ -17,19 +17,29 @@ type Setup struct {
 	Description string
 	Source      string
 	Excludes    []string
-	Destination map[string]string
+	Destination
+}
+
+type Destination struct {
+	Path          string
+	LocalHost     string
+	RemoteHost    string
+	Username      string
+	Port          string
+	PrivateKeyUrl string
 }
 
 func (s Setup) Submittable() bool {
 	strs := s.Name != "" &&
 		s.Source != ""
 	maps := func() bool {
-		dest := ((s.Destination["localHost"] != "" ||
-			s.Destination["remoteHost"] != "") &&
-			s.Destination["username"] != "" &&
-			s.Destination["port"] != "" &&
-			s.Destination["privateKeyUrl"] != "") ||
-			s.Destination["mountPoint"] != ""
+		dest := ((s.LocalHost != "" ||
+			s.RemoteHost != "") &&
+			s.Username != "" &&
+			s.Path != "" &&
+			s.Port != "" &&
+			s.PrivateKeyUrl != "") ||
+			s.Path != ""
 		return dest
 	}
 	return strs && maps()
