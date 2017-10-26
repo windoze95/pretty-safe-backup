@@ -18,6 +18,7 @@ type Setup struct {
 	Source      string
 	Excludes    []string
 	Destination
+	Snapshot
 }
 
 type Destination struct {
@@ -30,20 +31,35 @@ type Destination struct {
 	Type          string
 }
 
+type Snapshot struct {
+	Frequency int
+	Yearly    *Rotation
+	Monthly   *Rotation
+	Daily     *Rotation
+}
+
+type Rotation struct {
+	Duration int
+}
+
 func (s Setup) Submittable() bool {
 	strs := s.Name != "" &&
 		s.Source != ""
-	maps := func() bool {
-		dest := ((s.LocalHost != "" ||
-			s.RemoteHost != "") &&
-			s.Username != "" &&
-			s.Path != "" &&
-			s.Port != "" &&
-			s.PrivateKeyUrl != "") ||
-			s.Path != ""
-		return dest
+	dest := func() (d bool) {
+		if s.Type == "remote" {
+			d = (s.LocalHost != "" ||
+				s.RemoteHost != "") &&
+				s.Username != "" &&
+				s.Path != "" &&
+				s.Port != "" &&
+				s.PrivateKeyUrl != ""
+		}
+		if s.Type == "mount" {
+			d = s.Path != ""
+		}
+		return d
 	}
-	return strs && maps()
+	return strs && dest()
 }
 
 var (

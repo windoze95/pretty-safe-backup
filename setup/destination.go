@@ -49,7 +49,7 @@ func remoteDirectory(answer *settings.Destination) {
 			Prompt: &survey.Input{
 				Message: `If you have a hostname or IP on a local network to the back-up destination,
 this will be used first when available. Otherwise, leave this blank.` + "\n",
-				Default: dest.RemoteHost,
+				Default: dest.LocalHost,
 			},
 		},
 		{
