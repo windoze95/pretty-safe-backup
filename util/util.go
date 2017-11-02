@@ -1,4 +1,3 @@
-// add methods to string??
 package util
 
 import (
