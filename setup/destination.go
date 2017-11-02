@@ -34,8 +34,7 @@ func (dest *Destination) WriteAnswer(destination string, value interface{}) erro
 	return nil
 }
 
-func remoteDirectory(answer *settings.Destination) {
-	dest := Destination{*answer}
+func remoteDirectory(dest *Destination) {
 	qs := []*survey.Question{
 		{
 			Name: "path",
@@ -70,27 +69,25 @@ this will be used first when available. Otherwise, leave this blank.` + "\n",
 			Name: "port",
 			Prompt: &survey.Input{
 				Message: "SSH port, leave this blank to use the default.\n",
-				Default: setDefaultOption(dest, "port"),
+				Default: setDefaultOption(*dest, "port"),
 			},
 		},
 		{
 			Name: "privateKeyUrl",
 			Prompt: &survey.Input{
 				Message: "Location of SSH private key, leave this blank to use the default.\n",
-				Default: setDefaultOption(dest, "privateKeyUrl"),
+				Default: setDefaultOption(*dest, "privateKeyUrl"),
 			},
 		},
 	}
-	err := survey.Ask(qs, &dest)
+	err := survey.Ask(qs, dest)
 	if err != nil {
 		log.Fatal(err)
 	}
 	dest.Type = "remote"
-	*answer = dest.Destination
 }
 
-func mountPoint(answer *settings.Destination) {
-	dest := Destination{*answer}
+func mountPoint(dest *Destination) {
 	qs := []*survey.Question{
 		{
 			Name: "path",
@@ -100,7 +97,7 @@ func mountPoint(answer *settings.Destination) {
 			},
 		},
 	}
-	err := survey.Ask(qs, &dest)
+	err := survey.Ask(qs, dest)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,10 +107,10 @@ func mountPoint(answer *settings.Destination) {
 	dest.Username = ""
 	dest.Port = ""
 	dest.PrivateKeyUrl = ""
-	*answer = dest.Destination
 }
 
 func setDestination(answer *settings.Destination) {
+	dest := Destination{*answer}
 	options := []string{
 		"Remote directory",
 		"Mount point",
@@ -130,22 +127,23 @@ func setDestination(answer *settings.Destination) {
 	util.ClearClient()
 	switch selectedOption {
 	case options[0]:
-		remoteDirectory(answer)
+		remoteDirectory(&dest)
 	case options[1]:
-		mountPoint(answer)
+		mountPoint(&dest)
 	}
+	*answer = dest.Destination
 }
 
 func setDefaultOption(dest Destination, d string) (r string) {
 	switch d {
 	case "port":
 		r = dest.Port
-		if dest.Port == "" {
+		if util.IsEmptyString(dest.Port) {
 			r = "22"
 		}
 	case "privateKeyUrl":
 		r = dest.PrivateKeyUrl
-		if dest.PrivateKeyUrl == "" {
+		if util.IsEmptyString(dest.PrivateKeyUrl) {
 			r = os.Getenv("HOME") + "/.ssh/id_rsa"
 		}
 	}
