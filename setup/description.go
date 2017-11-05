@@ -11,7 +11,7 @@ type Description struct {
 	Result string
 }
 
-func (d *Description) WriteAnswer(description string, value interface{}) error {
+func (d *Description) WriteAnswer(qsName string, value interface{}) error {
 	d.Result = strings.Trim(value.(string), " ")
 	return nil
 }

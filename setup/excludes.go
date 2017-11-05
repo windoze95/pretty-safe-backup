@@ -11,7 +11,7 @@ type Excludes struct {
 	Result []string
 }
 
-func (e *Excludes) WriteAnswer(excludes string, value interface{}) error {
+func (e *Excludes) WriteAnswer(qsName string, value interface{}) error {
 	var formatedList []string
 	list := strings.Split(value.(string), "\n")
 	for _, str := range list {

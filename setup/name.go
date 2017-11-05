@@ -11,7 +11,7 @@ type Name struct {
 	Result string
 }
 
-func (n *Name) WriteAnswer(name string, value interface{}) error {
+func (n *Name) WriteAnswer(qsName string, value interface{}) error {
 	n.Result = strings.Trim(value.(string), " ")
 	return nil
 }

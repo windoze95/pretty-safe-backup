@@ -14,10 +14,10 @@ type Destination struct {
 	settings.Destination
 }
 
-func (dest *Destination) WriteAnswer(destination string, value interface{}) error {
+func (dest *Destination) WriteAnswer(qsName string, value interface{}) error {
 	util.ClearClient()
 	trim := strings.Trim(value.(string), " ")
-	switch destination {
+	switch qsName {
 	case "path":
 		dest.Path = trim
 	case "localHost":
@@ -47,7 +47,7 @@ func remoteDirectory(dest *Destination) {
 			Name: "localHost",
 			Prompt: &survey.Input{
 				Message: `If you have a hostname or IP on a local network to the back-up destination,
-this will be used first when available. Otherwise, leave this blank.` + "\n",
+  this will be used first when available. Otherwise, leave this blank.` + "\n",
 				Default: dest.LocalHost,
 			},
 		},

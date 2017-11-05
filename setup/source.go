@@ -11,7 +11,7 @@ type Source struct {
 	Result string
 }
 
-func (s *Source) WriteAnswer(source string, value interface{}) error {
+func (s *Source) WriteAnswer(qsName string, value interface{}) error {
 	s.Result = strings.Trim(value.(string), " ")
 	return nil
 }

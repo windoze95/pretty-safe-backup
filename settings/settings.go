@@ -18,7 +18,7 @@ type Setup struct {
 	Source      string
 	Excludes    []string
 	Destination
-	Snapshot
+	Rotations
 }
 
 type Destination struct {
@@ -31,20 +31,22 @@ type Destination struct {
 	Type          string
 }
 
-type Snapshot struct {
+type Rotations struct {
 	Frequency int
-	Yearly    *Rotation
-	Monthly   *Rotation
-	Daily     *Rotation
-}
-
-type Rotation struct {
-	Duration int
+	Initial   int
+	Daily     int
+	Monthly   int
+	Yearly    int
 }
 
 func (s Setup) Submittable() bool {
 	strs := s.Name != "" &&
 		s.Source != ""
+	ints := s.Frequency >= 1 &&
+		s.Frequency <= 1440 &&
+		s.Initial >= 1 &&
+		(s.Daily <= 28 ||
+			s.Daily > 300)
 	dest := func() (d bool) {
 		if s.Type == "remote" {
 			d = (s.LocalHost != "" ||
@@ -59,7 +61,7 @@ func (s Setup) Submittable() bool {
 		}
 		return d
 	}
-	return strs && dest()
+	return strs && ints && dest()
 }
 
 var (
@@ -75,22 +77,19 @@ func init() {
 }
 
 func NewConfig(answerSet *Setup) {
-	newOperationPath := filepath.Join(configDir, answerSet.Name)
-	err := os.MkdirAll(newOperationPath, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	newConf := filepath.Join(newOperationPath, "rc.toml")
+	newConf := filepath.Join(configDir, answerSet.Name+".toml")
 	f, err := os.Create(newConf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 	var config = map[string]interface{}{
+		"name":        answerSet.Name,
 		"description": answerSet.Description,
 		"source":      answerSet.Source,
 		"excludes":    answerSet.Excludes,
 		"destination": answerSet.Destination,
+		"rotations":   answerSet.Rotations,
 	}
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {

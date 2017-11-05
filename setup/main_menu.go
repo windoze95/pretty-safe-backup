@@ -33,6 +33,7 @@ Menu:
 			"Source",
 			"Excludes",
 			"Destination",
+			"Rotations",
 		}
 		if answers.Submittable() {
 			options = append(options, ">> Next <<")
@@ -62,7 +63,9 @@ Menu:
 				case 3:
 					setExcludes(&answers.Excludes)
 				case 4:
-					setDestination(&answers.Destination) // because maps
+					setDestination(&answers.Destination)
+				case 5:
+					setRotations(&answers.Rotations)
 				default:
 					break Menu
 				}
