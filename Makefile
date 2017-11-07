@@ -1,5 +1,6 @@
 VERSION=0.0.1
 PATH_BUILD=build/
+FILE_ARCH=linux_amd64
 FILE_COMMAND=psb
 
 clean:
@@ -15,7 +16,7 @@ build: clean
 version:
 	@echo $(VERSION)
 
-#install:
-#	install -d -m 755 '$(HOME)/bin/'
-#	install $(PATH_BUILD)$(VERSION)/$(FILE_ARCH)/$(FILE_COMMAND) '$(HOME)/bin/$(FILE_COMMAND)'
-#
+install:
+	install -d -m 755 '/usr/share/icons/hicolor/48x48/apps/'
+	install -m 0644 icon/48x48/psb.png /usr/share/icons/hicolor/48x48/apps/psb.png
+	install $(PATH_BUILD)$(VERSION)/$(FILE_ARCH)/$(FILE_COMMAND) '/usr/bin/$(FILE_COMMAND)'
