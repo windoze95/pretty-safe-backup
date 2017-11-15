@@ -1,5 +1,5 @@
 {
-  "AppName": "pretty-safe-backup",
+  "AppName": "psb",
   "ConfigVersion": "0.9",
   "BuildSettings": {
     "LdFlags": "-s",
