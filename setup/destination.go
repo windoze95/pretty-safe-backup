@@ -2,7 +2,6 @@ package setup
 
 import (
 	"log"
-	"os"
 	"strings"
 
 	"github.com/orange-lightsaber/pretty-safe-backup/settings"
@@ -144,7 +143,11 @@ func setDefaultOption(dest Destination, d string) (r string) {
 	case "privateKeyUrl":
 		r = dest.PrivateKeyUrl
 		if util.IsEmptyString(dest.PrivateKeyUrl) {
-			r = os.Getenv("HOME") + "/.ssh/id_rsa"
+			u, err := util.GetUser()
+			if err != nil {
+				log.Println("error showing users home directory:" + err.Error())
+			}
+			r = u.HomeDir + "/.ssh/id_rsa"
 		}
 	}
 	return

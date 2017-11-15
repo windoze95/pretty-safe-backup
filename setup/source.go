@@ -19,7 +19,7 @@ func (s *Source) WriteAnswer(qsName string, value interface{}) error {
 func setSource(answer *string) {
 	source := Source{*answer}
 	prompt := &survey.Input{
-		Message: "Create a name for this operation",
+		Message: "Source Directory.",
 		Help: `ex: /home/user
 If there are files, or directories you do not
 wish to backup, you may define these excluded

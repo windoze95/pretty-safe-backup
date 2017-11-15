@@ -16,7 +16,7 @@ func shortAnswer(s string) (r string) {
 	return
 }
 
-func mainMenu(answers *settings.Setup) *settings.Setup {
+func mainMenu(answers *settings.RunConfig) *settings.RunConfig {
 	defaultOption := 0
 	setDefaultOption := func(i int, o []string) {
 		i++

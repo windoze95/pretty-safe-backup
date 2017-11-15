@@ -5,6 +5,6 @@ import (
 )
 
 func Build() {
-	answerSet := mainMenu(&settings.Setup{})
-	settings.NewConfig(answerSet)
+	answerSet := mainMenu(&settings.RunConfig{})
+	settings.WriteRunConfig(answerSet)
 }
