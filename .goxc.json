@@ -1,26 +1,27 @@
 {
-  "AppName": "psb",
-  "ConfigVersion": "0.9",
-  "BuildSettings": {
+	"AppName": "pretty-safe-backup",
+	"Tasks": [
+		"interpolate-source",
+		"default"
+	],
+	"TasksExclude": [
+		"archive",
+		"codesign",
+		"copy-resources",
+		"deb",
+		"deb-dev",
+		"downloads-page",
+		"go-vet",
+		"go-test",
+		"go-install",
+		"rmbin"
+	],
+	"BuildConstraints": "linux,amd64 linux,arm64",
+	"ConfigVersion": "0.9",
+	"BuildSettings": {
     "LdFlags": "-s",
-    "LdFlagsXVars": {
-      "Version": "main.VERSION"
-    }
-  },
-  "Tasks": [
-    "interpolate-source",
-    "default"
-  ],
-  "TasksExclude": [
-    "archive",
-    "codesign",
-    "copy-resources",
-    "deb",
-    "deb-dev",
-    "downloads-page",
-    "go-vet",
-    "go-test",
-    "go-install",
-    "rmbin"
-  ]
+		"LdFlagsXVars": {
+			"Version": "main.VERSION"
+		}
+	}
 }

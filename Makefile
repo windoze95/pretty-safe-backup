@@ -1,7 +1,8 @@
-VERSION=0.0.1
+VERSION=0.1.0
 PATH_BUILD=build/
 FILE_ARCH=linux_amd64
-FILE_COMMAND=psb
+FILE_COMMAND=pretty-safe-backup
+LN_FILE_COMMAND=psb
 
 clean:
 	@rm -rf ./build
@@ -17,6 +18,7 @@ version:
 	@echo $(VERSION)
 
 install:
-	install -d -m 0755 '/usr/share/icons/hicolor/48x48/apps/'
-	install -m 0644 icon/48x48/psb.png /usr/share/icons/hicolor/48x48/apps/psb.png
+	install -d -m 0755 '/etc/xdg/psb/'
+	install -d -m 0755 '/var/log/psb/'
 	install $(PATH_BUILD)$(VERSION)/$(FILE_ARCH)/$(FILE_COMMAND) '/usr/bin/$(FILE_COMMAND)'
+	ln -s '/usr/bin/$(FILE_COMMAND)' '/usr/bin/$(LN_FILE_COMMAND)'
