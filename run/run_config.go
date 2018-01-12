@@ -115,11 +115,11 @@ func GetRunConfigs() (rcs []RunConfig, err error) {
 	return getRunConfigs(true, true)
 }
 
-func GetEnabledConfigs() (rcs []RunConfig, err error) {
+func GetEnabledRunConfigs() (rcs []RunConfig, err error) {
 	return getRunConfigs(true, false)
 }
 
-func GetDisabledConfigs() (rcs []RunConfig, err error) {
+func GetDisabledRunConfigs() (rcs []RunConfig, err error) {
 	return getRunConfigs(false, true)
 }
 
