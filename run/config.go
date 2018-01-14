@@ -3,6 +3,7 @@ package run
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 )
@@ -10,10 +11,12 @@ import (
 type Config struct {
 	RunConfigDir string `toml:"run-config-directory"`
 	logDir       string
+	configDir    string
 }
 
 func (c *Config) initDefaults() {
-	c.RunConfigDir = "/etc/xdg/psb/run"
+	c.configDir = "/etc/xdg/psb"
+	c.RunConfigDir = filepath.Join(c.configDir, "run")
 	c.logDir = "/var/log/psb/"
 }
 
@@ -21,7 +24,7 @@ var config = Config{}
 
 func init() {
 	config.initDefaults()
-	configFile := "/etc/xdg/psb/config.toml"
+	configFile := filepath.Join(config.configDir, "config.toml")
 	if _, err := os.Stat(configFile); !os.IsNotExist(err) {
 		if _, err := toml.DecodeFile(configFile, &config); err != nil {
 			log.Fatal(err)

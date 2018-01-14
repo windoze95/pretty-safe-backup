@@ -3,7 +3,11 @@ package rsync
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 type Rsync struct {
@@ -33,29 +37,48 @@ func (r *Rsync) generateExcludeArgs() (eArgs []string) {
 	return
 }
 
+func (r *Rsync) writeScript(file string) error {
+	data := fmt.Sprintf("#!/bin/sh\nrsync %s", strings.Join(r.args, " "))
+	return ioutil.WriteFile(file, []byte(data), 0644)
+}
+
 func (r *Rsync) loadArgs() {
 	if r.Flags != "" {
 		r.args = append(r.args, "-"+r.Flags)
 	}
+	r.args = append(r.args, "--rsync-path='sudo", "rsync'")
+	r.args = append(r.args, "--delete")
 	r.args = append(r.args, r.generateIncludeArgs()...)
 	r.args = append(r.args, r.generateExcludeArgs()...)
 	if r.Host != "" {
-		r.args = append(r.args, "-e", fmt.Sprintf("/usr/bin/ssh -i %s -p %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l %s", r.Key, r.Port, r.User))
-		r.args = append(r.args, r.From)
-		r.args = append(r.args, fmt.Sprintf("%s@%s:%s", r.User, r.Host, r.To))
-		return
+		r.args = append(r.args, "-e",
+			fmt.Sprintf("'/usr/bin/ssh -i %s -p %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l %s'",
+				r.Key, r.Port, r.User))
+		r.args = append(r.args, r.From+"/")
+		r.args = append(r.args, fmt.Sprintf("%s@%s:'%s'", r.User, r.Host, r.To))
+	} else {
+		r.args = append(r.args, r.From+"/", r.To)
 	}
-	r.args = append(r.args, r.From, r.To)
 }
 
-func (r *Rsync) Run() (string, error) {
-	r.loadArgs()
-	rsyncCmd := exec.Command("rsync", r.args...)
+func (r *Rsync) Run(configDir string, name string) (res string, err error) {
+	file := filepath.Join(configDir, name+".sh")
+	if _, e := os.Stat(file); os.IsNotExist(e) {
+		r.loadArgs()
+		err = r.writeScript(file)
+		if err != nil {
+			err = fmt.Errorf("Error writing Rsync script: %s", err.Error())
+			return
+		}
+	}
+	rsyncCmd := exec.Command("/bin/sh", file)
 	var outputBuffer bytes.Buffer
 	rsyncCmd.Stdout = &outputBuffer
-	err := rsyncCmd.Run()
+	err = rsyncCmd.Run()
 	if err != nil {
-		err = fmt.Errorf("Rsync error:", err.Error())
+		// Remove script if Rsync has an error
+		os.Remove(file)
+		err = fmt.Errorf("Rsync error: %s", err.Error())
 	}
 	return outputBuffer.String(), err
 }

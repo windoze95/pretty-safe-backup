@@ -10,23 +10,24 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/orange-lightsaber/psb-rotatord/rotator"
 )
 
 type RunConfig struct {
 	Enabled          bool     `toml:"enabled"`
-	CompatibilityKey string   `toml:"compatibilityKey"`
+	CompatibilityKey string   `toml:"compatibility-key"`
 	Name             string   `toml:"name"`
 	Description      string   `toml:"description"`
 	Source           string   `toml:"source"`
-	Includes         []string `toml:"Includes"`
+	Includes         []string `toml:"includes"`
 	Excludes         []string `toml:"excludes"`
-	Destination      `toml:"destination"`
-	Rotations        `toml:"rotations"`
-	lastRun          time.Time
+	Destination
+	Rotations
+	lastRun time.Time
 }
 
 type Destination struct {
-	Path          string `toml:"path"`
+	BackupDir     string `toml:"backup-directory"`
 	RemoteHost    string `toml:"remoteHost"`
 	Username      string `toml:"username"`
 	Port          string `toml:"port"`
@@ -56,6 +57,23 @@ func (rc *RunConfig) WriteRunConfig() (err error) {
 	err = ioutil.WriteFile(newRunConfigFile, buf.Bytes(), 0644)
 	if err != nil {
 		err = fmt.Errorf("Error writing run config to file %s: %s", newRunConfigFile, err.Error())
+		return
+	}
+	// Remove old Rsync script if run config was recreated
+	os.Remove(filepath.Join(config.configDir, rc.Name+".sh"))
+	return
+}
+
+func (rc *RunConfig) GetRotatorData() (rcd rotator.RunConfigData, err error) {
+	buf := new(bytes.Buffer)
+	err = toml.NewEncoder(buf).Encode(rc)
+	if err != nil {
+		err = fmt.Errorf("Error encoding run config with the name %s: %s", rc.Name, err.Error())
+		return
+	}
+	_, err = toml.Decode(buf.String(), &rcd)
+	if err != nil {
+		err = fmt.Errorf("Error decoding run config (name: %s) data into RunConfigData type: %s", rc.Name, err.Error())
 		return
 	}
 	return
