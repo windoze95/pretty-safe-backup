@@ -15,10 +15,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var (
-	errorLogger *log.Logger
-	lastRunUTC  = make(map[string]time.Time)
-)
+var errorLogger *log.Logger
 
 func setLogOutput(logName string) *log.Logger {
 	logger := log.New(nil, log.Prefix(), log.LstdFlags)
