@@ -27,11 +27,11 @@ type RunConfig struct {
 }
 
 type Destination struct {
-	BackupDir     string `toml:"backup-directory"`
-	RemoteHost    string `toml:"remoteHost"`
-	Username      string `toml:"username"`
-	Port          string `toml:"port"`
-	PrivateKeyUrl string `toml:"privateKeyUrl"`
+	BackupDir      string `toml:"backup-directory"`
+	RemoteHost     string `toml:"remote-host"`
+	Username       string `toml:"username"`
+	Port           string `toml:"port"`
+	PrivateKeyPath string `toml:"private-key"`
 }
 
 type Rotations struct {

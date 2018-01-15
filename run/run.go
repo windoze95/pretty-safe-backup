@@ -107,7 +107,7 @@ func runRsync(rc RunConfig, to string) (string, error) {
 		User:     rc.Username,
 		Port:     rc.Port,
 		Host:     rc.RemoteHost,
-		Key:      rc.PrivateKeyUrl,
+		Key:      rc.PrivateKeyPath,
 		Flags:    "aAx",
 		Includes: rc.Includes,
 		Excludes: rc.Excludes,
@@ -144,7 +144,7 @@ func Run(rc RunConfig, wg *sync.WaitGroup) {
 		Username: rc.Username,
 		Host:     rc.RemoteHost,
 		Port:     rc.Port,
-		KeyPath:  rc.PrivateKeyUrl,
+		KeyPath:  rc.PrivateKeyPath,
 	}
 	timeSince, available, err := GetTimeSinceLastRun(rcd, remoteRun)
 	if err != nil {
