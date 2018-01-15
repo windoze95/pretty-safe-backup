@@ -14,7 +14,7 @@ make build
 
 #### Install
 ```sh
-make install
+sudo make install
 ```
 
 #### Remote server
