@@ -1,10 +1,14 @@
 # psb
 pretty-safe-backup ;)
 
-Backups are extremely important, and there's tons of great software available that come with different ways to customize your backups. One that inspired this project is Rsnapshot, it's perfect as long as the computer is always running, otherwise things get a little weird... I'm hoping this will fill the gap.  
+Backups are extremely important, and there's tons of great software available that come with different ways to customize your backups. One that inspired this project is Rsnapshot, it's perfect as long as the computer is always running, otherwise things get a little weird... I'm hoping this will fill the gap.
+
+* On the go, sometime's you don't have time to wait for, or even notice you have a backup operation running. If an operation is interupted, it will be discarded, and restart next time you open your laptop.
+* How many snapshots!? Using rsync, only new and modified files are copied, all other files that have not changed are hard linked to the snapshot as to not take up 100% of that space again.
+* Hard links, not to be confused with symbolic links, when the original file's snapshot reaches end of life, any hard links to that file will still have the original data.
 
 ## Setup
-> Dependencies: openssh, rsync\
+> Dependencies: openssh, rsync, cp\
 > Build dependencies: golang, make, goxc
 
 #### Build
@@ -41,7 +45,7 @@ systemctl start psb.service
 ```
 
 #### Configuration
-Configuration files are writen and edited internally, if created manually, any edits in the future may require that you manually delete the config's rsync script in */etc/xdg/psb/*, which will be necessary until the configuration editor is up, and any edits to existing run configs (regardless of method) will require a restart of the rotator daemon for the changes to take effect and to drop the old data from memory.
+Configuration files are writen and edited internally, if created manually, any edits in the future may require that you manually delete the config's rsync script in */etc/xdg/psb/*, which will be necessary until a proper configuration editor is implimented, and any edits to existing run configs (regardless of method) will require a restart of the rotator daemon for the changes to take effect and to drop the old data from memory.
 
 Run configs, by default, go in */etc/xdg/psb/run/*.
 
