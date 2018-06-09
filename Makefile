@@ -21,4 +21,5 @@ install:
 	install -d -m 0755 '/etc/xdg/psb/'
 	install -d -m 0755 '/var/log/psb/'
 	install $(PATH_BUILD)$(VERSION)/$(FILE_ARCH)/$(FILE_COMMAND) '/usr/bin/$(FILE_COMMAND)'
+	rm -f '/usr/bin/$(LN_FILE_COMMAND)'
 	ln -s '/usr/bin/$(FILE_COMMAND)' '/usr/bin/$(LN_FILE_COMMAND)'
