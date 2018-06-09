@@ -16,7 +16,7 @@ Backups are extremely important, and there's tons of great software available th
 make build
 ```
 
-#### Install
+#### Install/Update
 ```sh
 sudo make install
 ```
@@ -45,19 +45,18 @@ systemctl start psb.service
 ```
 
 #### Configuration
-Configuration files are writen and edited internally, if created manually, any edits in the future may require that you manually delete the config's rsync script in */etc/xdg/psb/*, which will be necessary until a proper configuration editor is implimented, and any edits to existing run configs (regardless of method) will require a restart of the rotator daemon for the changes to take effect and to drop the old data from memory.
+Any edits to existing run configs (regardless of method) will require a restart of the rotator daemon for the changes to take effect and to drop the old data from memory.
 
 Run configs, by default, go in */etc/xdg/psb/run/*.
 
 - enabled: True to enable, or false to disable.
-
 - compatibility-key: A string, unique to each config and is regenerated each time the application writes/edits the run config. If an existing run config is edited, it is required to restart the rotator daemon on the remote destination if you are using one.
 - name: The name field in the config must match the name of the file(not including extension ".toml"), and should contain no spaces.
 - description: A short description of the backup operation.
 - source: Absolute path to source directory.
-- includes: Add paths relative to source to directories or files to make exceptions to an excluded directory, excepts wildcard as well.
-- excludes: Add paths relative to source to directories or files, excepts wildcard as well.
-- backup-directory: Optional. Overrides the path to the backups directory for current operation.
+- includes: Add paths relative to source to directories or files to make exceptions to an excluded directory, accepts wildcard as well.
+- excludes: Add paths relative to source to directories or files, accepts wildcard as well.
+- backup-directory: Optional. Overrides the path to the backups directory.
 - remote-host: Only for remote backup destination. Address to remote backup server.
 - username: Only for remote backup destination. Username of SSH user on remote backup server.
 - port: Only for remote backup destination. SSH port to remote backup server.
@@ -79,7 +78,7 @@ source = "/home/leia"
 includes = ["excluded_directory/overriden_directory_to_keep"]
 excludes = [".cache/*", "excluded_directory"]
 backup-directory = ""
-remote-host = "138.831.42.24"
+remote-host = "192.168.1.100"
 username = "remoteuser"
 port = "22"
 private-key = "/home/leia/.ssh/id_rsa"
