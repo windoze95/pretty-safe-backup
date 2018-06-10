@@ -77,7 +77,6 @@ func (r *Rsync) Run(configDir string, name string) (res string, err error) {
 			err = fmt.Errorf("Error reading Rsync script: %s", err.Error())
 			return
 		}
-		fmt.Println(string(scriptBuf))
 		if string(scriptBuf) != r.generateScript() {
 			err = r.writeScript(file)
 			if err != nil {
