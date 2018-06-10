@@ -48,6 +48,7 @@ func (s *SSH) Run() (res string, err error) {
 		return
 	}
 	defer session.Close()
+	defer client.Close()
 	var outputBuffer bytes.Buffer
 	session.Stdout = &outputBuffer
 	// Run the command
