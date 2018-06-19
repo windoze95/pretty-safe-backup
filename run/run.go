@@ -187,8 +187,8 @@ func Daemonize() {
 		log.Fatal(err)
 	}
 	pollrate := getPollrate(runConfigs)
+	var wg sync.WaitGroup
 	for {
-		var wg sync.WaitGroup
 		for _, rc := range runConfigs {
 			wg.Add(1)
 			go Run(rc, &wg)
