@@ -43,7 +43,7 @@ type Rotations struct {
 	Yearly    int `toml:"yearly"`
 }
 
-func (rc *RunConfig) WriteRunConfig() (err error) {
+func (rc *RunConfig) WriteRunConfig() (newRunConfigFile string, err error) {
 	err = rc.generateCompatibilityKey()
 	if err != nil {
 		return
@@ -53,7 +53,7 @@ func (rc *RunConfig) WriteRunConfig() (err error) {
 	if err != nil {
 		return
 	}
-	newRunConfigFile := filepath.Join(config.RunConfigDir, rc.Name+".toml")
+	newRunConfigFile = filepath.Join(config.RunConfigDir, rc.Name+".toml")
 	err = ioutil.WriteFile(newRunConfigFile, buf.Bytes(), 0644)
 	if err != nil {
 		err = fmt.Errorf("Error writing run config to file %s: %s", newRunConfigFile, err.Error())
@@ -81,7 +81,7 @@ func (rc *RunConfig) GetRotatorData() (rcd rotator.RunConfigData, err error) {
 
 func (rc *RunConfig) Enable() error {
 	rc.Enabled = true
-	err := rc.WriteRunConfig()
+	_, err := rc.WriteRunConfig()
 	if err != nil {
 		err = fmt.Errorf("Error enabling run config: %s", err.Error())
 	}
@@ -90,7 +90,7 @@ func (rc *RunConfig) Enable() error {
 
 func (rc *RunConfig) Disable() error {
 	rc.Enabled = false
-	err := rc.WriteRunConfig()
+	_, err := rc.WriteRunConfig()
 	if err != nil {
 		err = fmt.Errorf("Error disabling run config: %s", err.Error())
 	}
@@ -165,7 +165,7 @@ func DisableRunConfig(name string) error {
 	return err
 }
 
-func decodeRunConfig(path string) (rc RunConfig, err error) {
+func DecodeRunConfig(path string) (rc RunConfig, err error) {
 	if _, e := os.Stat(path); os.IsNotExist(e) {
 		err = fmt.Errorf("run config file %s does not exist", path)
 		return
@@ -197,7 +197,7 @@ func getRunConfigs(enabled bool, disabled bool) (rcs []RunConfig, err error) {
 			if ok {
 				return nil
 			}
-			c, e := decodeRunConfig(path)
+			c, e := DecodeRunConfig(path)
 			switch {
 			case enabled && c.Enabled:
 				runConfigChan <- c

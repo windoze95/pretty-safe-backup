@@ -36,21 +36,13 @@ psbuser ALL= NOPASSWD:/usr/bin/rsync
 
 Then back to the host...
 
-#### Enable and start service
-An example Systemd service file can be found in [./examples](examples)
-```sh
-sudo cp ./examples/psb.service /etc/systemd/system/psb.service
-systemctl enable psb.service
-systemctl start psb.service
-```
-
 #### Configuration
 Any edits to existing run configs (regardless of method) will require a restart of the rotator daemon for the changes to take effect and to drop the old data from memory.
 
-Run configs, by default, go in */etc/xdg/psb/run/*.
+To generate a run config, start by creating a profile, see the explanation and example below.
 
+Profile explanation:
 - enabled: True to enable, or false to disable.
-- compatibility-key: A string, unique to each config and is regenerated each time the application writes/edits the run config. If an existing run config is edited, it is required to restart the rotator daemon on the remote destination if you are using one.
 - name: The name field in the config must match the name of the file(not including extension ".toml"), and should contain no spaces.
 - description: A short description of the backup operation.
 - source: Absolute path to source directory.
@@ -68,10 +60,9 @@ Run configs, by default, go in */etc/xdg/psb/run/*.
 - monthly: Number of months to keep monthly snapshots.
 - yearly: Number of years to keep yearly snapshots.
 
-Example run config, *home.toml*:
+Example profile:
 ```
 enabled = true
-compatibility-key = "d2520db8729506f8850d71d87d86a1f8"
 name = "home"
 description = "Emergency Hoth evacuation backups"
 source = "/home/leia"
@@ -88,4 +79,18 @@ initial = 7
 daily = 2
 monthly = 10
 yearly = 2
+```
+
+After you have a profile created, load it!
+```sh
+sudo psb -L /path/to/profile
+```
+Run configs, by default, are generated in */etc/xdg/psb/run/*
+
+#### Enable and start service
+An example Systemd service file can be found in [./examples](examples)
+```sh
+sudo cp ./examples/psb.service /etc/systemd/system/psb.service
+systemctl enable psb.service
+systemctl start psb.service
 ```
